@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAT - Sistem Asesmen Terproteksi</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { width: 100%; height: 100%; background-color: #e0f2fe; display: flex; justify-content: center; align-items: center; padding: 20px 0; overflow: hidden; }
+        .auth-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 480px; padding: 15px; z-index: 10; }
+        .main-card { background: #ffffff; border: 2px solid #38bdf8; padding: 35px 30px; border-radius: 24px; box-shadow: 0 20px 40px rgba(2, 132, 199, 0.12); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .logo-img { width: 90px; height: 100px; object-fit: contain; margin-bottom: 12px; }
+        .main-title { color: #0f172a; font-size: 21px; font-weight: 900; text-transform: uppercase; }
+        .sub-title-sat { font-size: 34px; font-weight: 900; color: #0284c7; margin: 4px 0; }
+        .tagline { color: #334155; font-size: 13px; font-weight: 700; margin-bottom: 25px; }
+        .form-section { width: 100%; text-align: left; }
+        .form-section h3 { color: #0f172a; font-size: 19px; font-weight: 800; margin-bottom: 4px; text-align: center; }
+        .form-section p.desc { color: #334155; font-size: 13px; margin-bottom: 20px; text-align: center; }
+        .form-group { margin-bottom: 15px; width: 100%; }
+        .form-group label { display: block; color: #0f172a; font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+        .input-wrapper { position: relative; width: 100%; }
+        .form-group input, .form-group select { width: 100%; padding: 13px 45px 13px 15px; background: #f8fafc; border: 1px solid #94a3b8; border-radius: 12px; font-size: 14px; color: #0f172a; outline: none; }
+        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none; }
+        .main-btn { width: 100%; background: #0284c7; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 5px; }
+        #assessmentPage { display: none; width: 100%; max-width: 480px; }
+        #examPage { width: 100%; height: 100%; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #ffffff; display: none; flex-direction: column; z-index: 9999; }
+        header { height: 65px; background-color: #0369a1; color: white; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .header-info { display: flex; align-items: center; gap: 15px; font-size: 14px; }
+        .timer-box { background: #0284c7; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 15px; border: 1px solid #38bdf8; }
+        .content-area { width: 100%; flex-grow: 1; position: relative; background: #ffffff; }
+        iframe { width: 100%; height: 100%; border: none; display: block; overflow: hidden; }
+    </style>
+</head>
+<body>
+
+    <div id="loginPage" class="auth-container">
+        <div class="main-card">
+            <img src="logo.png" alt="Logo" class="logo-img">
+            <div class="main-title">Sistem Asesmen<br>Terproteksi</div>
+            <div class="sub-title-sat">SAT</div>
+            <div class="tagline">Secure • Intelligent • Integrated</div>
+            <div class="form-section">
+                <h3>Selamat Datang</h3>
+                <p class="desc">Silakan login untuk melanjutkan asesmen</p>
+                <div class="form-group">
+                    <label>NIS / NISN / No. Peserta</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="studentId" placeholder="Masukkan NIS...">
+                        <span class="toggle-password" onclick="togglePass('studentId', this)">👁️‍🗨️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="studentName" placeholder="Masukkan nama...">
+                </div>
+                <button type="button" class="main-btn" onclick="doLogin()">LOGIN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="assessmentPage" class="auth-container">
+        <div class="main-card">
+            <div class="main-title" style="font-size: 18px;">Konfirmasi Asesmen</div>
+            <div class="tagline" id="greetingUser" style="margin-bottom: 15px;">Selamat Datang</div>
+            <div class="form-section">
+                <h3>Pilih Kelas & Mapel</h3>
+                <div class="form-group">
+                    <label>Tingkat Kelas</label>
+                    <select id="selectClass">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="7">Kelas 7</option><option value="8">Kelas 8</option><option value="9">Kelas 9</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Pilih Rombel</label>
+                    <select id="selectRombel">
+                        <option value="">-- Pilih Rombel --</option>
+                        <option value="A">Rombel A</option><option value="B">Rombel B</option><option value="C">Rombel C</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mata Pelajaran</label>
+                    <select id="selectSubject">
+                        <option value="">-- Pilih Mapel --</option>
+                        <option value="pabp">Pendidikan Agama</option><option value="ips">IPS</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Token Ujian</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="examToken" placeholder="Masukkan token...">
+                        <span class="toggle-password" onclick="togglePass('examToken', this)">👁️‍🗨️</span>
+                    </div>
+                </div>
+                <button type="button" class="main-btn" onclick="doStart()">MULAI MENGERJAKAN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="examPage">
+        <header>
+            <div class="header-info">
+                <span>🛡️ <b>SAT Secure</b></span>
+                <span>👤 <span id="headerName">-</span></span>
+                <span>📚 <span id="headerSubject">-</span></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="timer-box" id="timerDisplay">⏱️ 15:00</div>
+                <button type="button" style="background:#ef4444; color:white; border:none; padding:8px 14px; border-radius:8px; font-weight: bold; cursor: pointer;" onclick="tryExitExam()">🚪 Keluar</button>
+            </div>
+        </header>
+        <div class="content-area">
+            <iframe id="examFrame" src="" sandbox="allow-scripts allow-forms allow-same-origin allow-popups" onload="checkFormSubmission(this)"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const links = { "ips": "https://docs.google.com/forms/d/e/1FAIpQLSdgZLoM9Ev_rdpNv9Y6EDOdPPF972nPjl_e_9pCkqZMpZuG1A/viewform?embedded=true" };
+        const subjectNames = { "ips": "IPS" };
+        let examTimer, timeLeft = 15 * 60;
+
+        function togglePass(id, el) {
+            let i = document.getElementById(id);
+            i.type = (i.type === "password") ? "text" : "password";
+            el.innerText = (i.type === "text") ? "👁️" : "👁️‍🗨️";
+        }
+
+        function checkFormSubmission(iframe) {
+            try {
+                if (iframe.contentWindow.location.href.includes("formResponse")) {
+                    alert("Ujian Selesai! Terima kasih telah berpartisipasi.");
+                    location.reload();
+                }
+            } catch (e) {}
+        }
+
+        function doLogin() {
+            let n = document.getElementById('studentName').value;
+            if(!n) return alert("Isi nama dulu!");
+            document.getElementById('greetingUser').innerText = "Halo, " + n;
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('assessmentPage').style.display = 'flex';
+        }
+
+        function doStart() {
+            let sub = document.getElementById('selectSubject').value;
+            if(!sub || document.getElementById('examToken').value !== "ips") return alert("Data atau Token salah!");
+            
+            document.getElementById('headerName').innerText = document.getElementById('studentName').value;
+            document.getElementById('headerSubject').innerText = subjectNames[sub];
+            document.getElementById('assessmentPage').style.display = 'none';
+            document.getElementById('examPage').style.display = 'flex';
+            document.getElementById('examFrame').src = links[sub];
+            
+            startTimer();
+            document.documentElement.requestFullscreen().catch(()=>{});
+        }
+
+        function startTimer() {
+            examTimer = setInterval(() => {
+                if (--timeLeft <= 0) { clearInterval(examTimer); alert("Waktu Habis!"); location.reload(); }
+                let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+                document.getElementById('timerDisplay').innerText = `⏱️ ${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            }, 1000);
+        }
+
+        function tryExitExam() {
+            if (timeLeft > 300) {
+                triggerWarning("🛑 DILARANG KELUAR! Ujian belum menyisakan 5 menit terakhir.");
+            } else if (confirm("Yakin ingin mengakhiri ujian?")) {
+                location.reload();
+            }
+        }
+
+        function triggerWarning(text) {
+            if (document.getElementById('warningOverlay')) return;
+            let div = document.createElement('div');
+            div.id = 'warningOverlay';
+            div.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(239,68,68,0.95);color:white;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999999;text-align:center;padding:20px;';
+            div.innerHTML = `<h1>⚠️ PERINGATAN!</h1><p style="font-size:18px;margin:20px 0;">${text}</p><button onclick="this.parentElement.remove()" style="padding:10px 20px;cursor:pointer;">KEMBALI KE UJIAN</button>`;
+            document.body.appendChild(div);
+        }
+    </script>
+</body>
+</html>
